@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.config.VersionConfig;
 import com.example.demo.dto.ResponceDto;
 import com.example.demo.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("image-upload")
@@ -21,6 +24,9 @@ import java.util.List;
 public class ImageUploadController {
     @Autowired
     private ImageUploadService s3Client;
+
+    @Autowired
+    private VersionConfig versionConfig;
 
     @Value("${aws.bucket-url}")
     private String bucketUrl;
@@ -50,6 +56,16 @@ public class ImageUploadController {
         System.out.println("inside gate all Method");
         List<String> images = s3Client.getAllImages();
         return ResponseEntity.ok(images);
+    }
+    @GetMapping("/version")
+    public Map<String, String> getVersion() {
+
+        Map<String, String> response = new HashMap<>();
+
+        response.put("version", versionConfig.getVersion());
+        response.put("buildTime", versionConfig.getBuildTime());
+
+        return response;
     }
 
 

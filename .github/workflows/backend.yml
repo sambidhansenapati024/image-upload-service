@@ -20,6 +20,13 @@ jobs:
           java-version: 21
           cache: maven
 
+      - name: Generate version.properties
+        run: |
+          cat > src/main/resources/version.properties <<EOF
+          version=${{ github.sha }}
+          buildTime=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
+
       - name: Build Project
         run: mvn clean package -DskipTests
 
