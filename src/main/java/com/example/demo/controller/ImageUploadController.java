@@ -43,7 +43,7 @@ public class ImageUploadController {
     @DeleteMapping("/{fileName}")
     public  ResponseEntity<String> delete(@PathVariable String fileName){
         s3Client.delete(fileName);
-        return ResponseEntity.ok("Deleted");
+        return ResponseEntity.ok("Deleted.");
     }
     @GetMapping("/getAll")
     public ResponseEntity<List<String>> getAllImage(){
