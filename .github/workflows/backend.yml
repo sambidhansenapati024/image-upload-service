@@ -1,0 +1,40 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Project
+        run: mvn clean package -DskipTests
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t sambidhan026/image-upload-service:latest .
+
+      - name: Push Docker Image
+        run: |
+          docker push sambidhan026/image-upload-service:latest
