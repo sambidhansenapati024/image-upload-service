@@ -47,6 +47,7 @@ public class ImageUploadController {
     }
     @GetMapping("/getAll")
     public ResponseEntity<List<String>> getAllImage(){
+        System.out.println("inside gate all Method");
         List<String> images = s3Client.getAllImages();
         return ResponseEntity.ok(images);
     }

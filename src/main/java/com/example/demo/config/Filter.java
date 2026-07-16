@@ -16,5 +16,9 @@ public class Filter extends OncePerRequestFilter {
         System.out.println("Remote Host------  " + request.getRemoteHost());
         System.out.println("Remote Port------  " + request.getRemotePort());
         filterChain.doFilter(request,response);
+        System.out.println("Client IP------  " + request.getRemoteAddr());
+        System.out.println("Remote User------  " + request.getRemoteUser());
+        System.out.println("Remote Host------  " + request.getRemoteHost());
+        System.out.println("Remote Port------  " + request.getRemotePort());
     }
 }
