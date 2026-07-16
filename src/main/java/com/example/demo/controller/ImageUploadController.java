@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("image-upload")
 @CrossOrigin(origins = {
         "http://localhost:2626",
-        "http://13.127.244.157:2626"})
+        "http://13.127.244.157:2626/"})
 public class ImageUploadController {
     @Autowired
     private ImageUploadService s3Client;
