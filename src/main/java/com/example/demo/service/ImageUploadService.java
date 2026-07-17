@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.DashboardStatsDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.model.MultipartUpload;
@@ -16,4 +17,6 @@ public interface ImageUploadService {
     void delete(String fileName);
 
     List<String> getAllImages();
+
+    DashboardStatsDto getDashboardStats();
 }

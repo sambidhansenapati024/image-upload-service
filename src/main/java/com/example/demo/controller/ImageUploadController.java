@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.config.VersionConfig;
+import com.example.demo.dto.DashboardStatsDto;
 import com.example.demo.dto.ResponceDto;
 import com.example.demo.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,15 @@ public class ImageUploadController {
         response.put("buildTime", versionConfig.getBuildTime());
 
         return response;
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<DashboardStatsDto> getDashboardStats() {
+
+        return ResponseEntity.ok(
+                s3Client.getDashboardStats()
+        );
+
     }
 
 

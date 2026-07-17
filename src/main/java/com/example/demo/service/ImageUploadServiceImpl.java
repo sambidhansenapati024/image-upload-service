@@ -8,6 +8,7 @@ import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import com.example.demo.dto.DashboardStatsDto;
 
 import java.io.IOException;
 import java.util.List;
@@ -66,5 +67,32 @@ public class ImageUploadServiceImpl implements ImageUploadService {
                         region,
                         obj.key()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public DashboardStatsDto getDashboardStats() {
+
+        ListObjectsV2Request request =
+                ListObjectsV2Request.builder()
+                        .bucket(bucketName)
+                        .build();
+
+        ListObjectsV2Response response =
+                s3Client.listObjectsV2(request);
+
+        DashboardStatsDto dto =
+                new DashboardStatsDto();
+
+        dto.setTotalImages(response.contents().size());
+
+        long totalSize = response.contents()
+                .stream()
+                .mapToLong(S3Object::size)
+                .sum();
+
+        dto.setTotalStorage(totalSize);
+
+        return dto;
+
     }
 }
