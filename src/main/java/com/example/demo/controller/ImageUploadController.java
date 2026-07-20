@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.config.VersionConfig;
 import com.example.demo.dto.DashboardStatsDto;
+import com.example.demo.dto.ImageResponse;
+import com.example.demo.dto.ImageUploadResponse;
 import com.example.demo.dto.ResponceDto;
 import com.example.demo.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("image-upload")
-@CrossOrigin(origins = {
-        "http://localhost:2626",
-        "http://13.127.244.157:2626/"})
 public class ImageUploadController {
     @Autowired
-    private ImageUploadService s3Client;
+    private ImageUploadService imageUploadService;
 
     @Autowired
     private VersionConfig versionConfig;
@@ -33,29 +32,25 @@ public class ImageUploadController {
     private String bucketUrl;
 
     @PostMapping("/upload")
-    public ResponseEntity<ResponceDto> upload(@RequestParam MultipartFile file) throws IOException {
-        String fileName = s3Client.imageUpload(file);
-        ResponceDto response = new ResponceDto();
-        response.setFileName(fileName);
-        response.setUrl(bucketUrl+fileName);
+    public ResponseEntity<ImageUploadResponse> upload(@RequestParam MultipartFile file) throws IOException {
+        ImageUploadResponse response = imageUploadService.imageUpload(file);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{fileName}")
     public ResponseEntity<byte[]> download(@PathVariable String fileName){
-        byte[] image = s3Client.download(fileName);
+        byte[] image = imageUploadService.download(fileName);
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(image);
     }
 
     @DeleteMapping("/{fileName}")
     public  ResponseEntity<String> delete(@PathVariable String fileName){
-        s3Client.delete(fileName);
+        imageUploadService.delete(fileName);
         return ResponseEntity.ok("Deleted");
     }
     @GetMapping("/getAll")
-    public ResponseEntity<List<String>> getAllImage(){
-        System.out.println("inside gate all Method");
-        List<String> images = s3Client.getAllImages();
+    public ResponseEntity<List<ImageResponse>> getAllImages (){
+        List<ImageResponse> images = imageUploadService.getAllImages();
         return ResponseEntity.ok(images);
     }
     @GetMapping("/version")
@@ -73,7 +68,7 @@ public class ImageUploadController {
     public ResponseEntity<DashboardStatsDto> getDashboardStats() {
 
         return ResponseEntity.ok(
-                s3Client.getDashboardStats()
+                imageUploadService.getDashboardStats()
         );
 
     }
