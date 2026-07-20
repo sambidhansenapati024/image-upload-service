@@ -36,7 +36,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**","/image-upload/version").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(
                         jwtFilter,
