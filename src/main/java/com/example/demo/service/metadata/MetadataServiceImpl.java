@@ -3,6 +3,8 @@ package com.example.demo.service.metadata;
 import com.example.demo.entity.ImageMetadata;
 import com.example.demo.entity.User;
 import com.example.demo.repo.ImageMetadataRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,9 +30,24 @@ public class MetadataServiceImpl
     }
 
     @Override
-    public List<ImageMetadata> findByUser(User user) {
+    public Page<ImageMetadata> findByUser(
+            User user,
+            Pageable pageable) {
 
-        return repository.findByUser(user);
+        return repository.findByUser(user, pageable);
+
+    }
+
+    @Override
+    public Page<ImageMetadata> findByUserAndSearch(
+            User user,
+            String search,
+            Pageable pageable) {
+
+        return repository.findByUserAndOriginalFileNameContainingIgnoreCase(
+                user,
+                search,
+                pageable);
 
     }
 
@@ -45,6 +62,13 @@ public class MetadataServiceImpl
     public void delete(ImageMetadata image) {
 
         repository.delete(image);
+
+    }
+
+    @Override
+    public List<ImageMetadata> findByUser(User user) {
+
+        return repository.findByUser(user);
 
     }
 }

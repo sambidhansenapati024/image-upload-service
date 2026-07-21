@@ -48,10 +48,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
+        System.out.println("Request Email: " + request.getEmail());
+        System.out.println("Request Password: " + request.getPassword());
+
 
         Optional<User> optionalUser =
                 userRepository.findByEmail(request.getEmail());
-
+        System.out.println("User Found: " + optionalUser.isPresent());
         if (optionalUser.isEmpty()) {
             return new LoginResponse(false,
                     "Invalid Email or Password",
@@ -59,6 +62,8 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = optionalUser.get();
+        System.out.println("DB Email: " + user.getEmail());
+        System.out.println("DB Password: " + user.getPassword());
 
         if (!passwordEncoder.matches(
                 request.getPassword(),

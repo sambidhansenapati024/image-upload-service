@@ -10,6 +10,10 @@ import com.example.demo.service.dashboard.DashboardService;
 import com.example.demo.service.storage.StorageService;
 import com.example.demo.util.MessageConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dto.DashboardStatsDto;
@@ -25,6 +29,7 @@ import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -49,47 +54,56 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     private ImageMapper imageMapper;
 
     @Override
-    public ImageUploadResponse imageUpload(MultipartFile file) throws IOException {
+    public List<ImageUploadResponse> imageUpload(MultipartFile[] files) throws IOException {
 
-        // Upload file to S3
-        StorageUploadResponse response =
-                storageService.upload(file);
-
-        // Get logged-in user's email
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
         String email = authentication.getName();
 
-        // Find user
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.USER_NOT_FOUND));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(MessageConstants.USER_NOT_FOUND));
 
-        // Create metadata
-        ImageMetadata metadata = new ImageMetadata();
+        List<ImageUploadResponse> responses = new ArrayList<>();
 
-        metadata.setOriginalFileName(file.getOriginalFilename());
+        for (MultipartFile file : files) {
 
-        metadata.setS3Key(response.getKey());
+            // Upload to S3
+            StorageUploadResponse storageResponse =
+                    storageService.upload(file);
 
-        metadata.setImageUrl(response.getUrl());
+            // Create metadata
+            ImageMetadata metadata = new ImageMetadata();
 
-        metadata.setFileSize(file.getSize());
+            metadata.setOriginalFileName(file.getOriginalFilename());
 
-        metadata.setContentType(file.getContentType());
+            metadata.setS3Key(storageResponse.getKey());
 
-        metadata.setUploadedAt(LocalDateTime.now());
+            metadata.setImageUrl(storageResponse.getUrl());
 
-        metadata.setUser(user);
+            metadata.setFileSize(file.getSize());
 
-        // Save to PostgreSQL
-        ImageMetadata savedMetadata = metadataService.save(metadata);
-        logger.info(
-                "User '{}' uploaded image '{}'",
-                user.getEmail(),
-                metadata.getOriginalFileName());
+            metadata.setContentType(file.getContentType());
 
-        return imageMapper.toUploadResponse(savedMetadata);
+            metadata.setUploadedAt(LocalDateTime.now());
+
+            metadata.setUser(user);
+
+            ImageMetadata savedMetadata =
+                    metadataService.save(metadata);
+
+            logger.info(
+                    "User '{}' uploaded image '{}'",
+                    user.getEmail(),
+                    metadata.getOriginalFileName());
+
+            responses.add(
+                    imageMapper.toUploadResponse(savedMetadata)
+            );
+        }
+
+        return responses;
     }
 
     @Override
@@ -122,14 +136,37 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     }
 
     @Override
-    public List<ImageResponse> getAllImages() {
+    public Page<ImageResponse> getImages(
+            int page,
+            int size,
+            String search,
+            String sortBy,
+            String direction) {
 
         User user = getLoggedInUser();
 
-        return metadataService.findByUser(user)
-                .stream()
-                .map(imageMapper::toImageResponse)
-                .toList();
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ImageMetadata> images;
+
+        if (search == null || search.isBlank()) {
+
+            images = metadataService.findByUser(user, pageable);
+
+        } else {
+
+            images = metadataService.findByUserAndSearch(
+                    user,
+                    search,
+                    pageable);
+
+        }
+
+        return images.map(imageMapper::toImageResponse);
 
     }
 

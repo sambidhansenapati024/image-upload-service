@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.S3Client;
+import org.springframework.data.domain.Page;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,9 +32,10 @@ public class ImageUploadController {
     private String bucketUrl;
 
     @PostMapping("/upload")
-    public ResponseEntity<ImageUploadResponse> upload(@RequestParam MultipartFile file) throws IOException {
-        ImageUploadResponse response = imageUploadService.imageUpload(file);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<ImageUploadResponse>> upload(@RequestParam MultipartFile[] file) throws IOException {
+        return ResponseEntity.ok(
+                imageUploadService.imageUpload(file)
+        );
     }
 
     @GetMapping("/{fileName}")
@@ -48,10 +49,30 @@ public class ImageUploadController {
         imageUploadService.delete(fileName);
         return ResponseEntity.ok("Deleted");
     }
-    @GetMapping("/getAll")
-    public ResponseEntity<List<ImageResponse>> getAllImages (){
-        List<ImageResponse> images = imageUploadService.getAllImages();
-        return ResponseEntity.ok(images);
+    @GetMapping
+    public ResponseEntity<Page<ImageResponse>> getImages(
+
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "12") int size,
+
+            @RequestParam(defaultValue = "") String search,
+
+            @RequestParam(defaultValue = "uploadedAt") String sortBy,
+
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        return ResponseEntity.ok(
+
+                imageUploadService.getImages(
+                        page,
+                        size,
+                        search,
+                        sortBy,
+                        direction)
+
+        );
+
     }
     @GetMapping("/version")
     public Map<String, String> getVersion() {
