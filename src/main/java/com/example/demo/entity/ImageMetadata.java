@@ -24,10 +24,10 @@ public class ImageMetadata {
 
     private LocalDateTime uploadedAt;
 
-    @Column(nullable = false)
-    private boolean deleted = false;
-
-    private LocalDateTime deletedAt;
+//    @Column(nullable = false)
+//    private boolean deleted = false;
+//
+//    private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
