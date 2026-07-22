@@ -28,4 +28,15 @@ public interface ImageUploadService {
     );
 
     DashboardStatsDto getDashboardStats();
+
+    Page<ImageResponse> getDeletedImages(
+            int page,
+            int size,
+            String search,
+            String sortBy,
+            String direction);
+
+    void restoreImage(Long imageId);
+
+    void permanentlyDelete(Long imageId);
 }

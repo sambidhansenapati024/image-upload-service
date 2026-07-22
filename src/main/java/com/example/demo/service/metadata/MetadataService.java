@@ -1,5 +1,6 @@
 package com.example.demo.service.metadata;
 
+import com.example.demo.dto.ImageResponse;
 import com.example.demo.entity.ImageMetadata;
 import com.example.demo.entity.User;
 import org.springframework.data.domain.Page;
@@ -25,8 +26,22 @@ public interface MetadataService {
 
     Optional<ImageMetadata> findByS3Key(String key);
 
-    void delete(ImageMetadata image);
 
     List<ImageMetadata> findByUser(User user);
+
+    Page<ImageMetadata> findDeletedByUser(
+            User user,
+            Pageable pageable);
+
+    Page<ImageMetadata> findDeletedByUserAndSearch(
+            User user,
+            String search,
+            Pageable pageable);
+
+    Optional<ImageMetadata> findByIdAndUser(Long id, User user);
+
+
+
+    void permanentDelete(ImageMetadata image);
 
 }

@@ -126,11 +126,13 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 
         }
 
-        storageService.delete(fileName);
+        metadata.setDeleted(true);
+        metadata.setDeletedAt(LocalDateTime.now());
 
-        metadataService.delete(metadata);
+        metadataService.save(metadata);
+
         logger.info(
-                "User '{}' deleted image '{}'",
+                "User '{}' moved image '{}' to recycle bin",
                 loggedInUser.getEmail(),
                 metadata.getOriginalFileName());
     }
@@ -168,6 +170,82 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 
         return images.map(imageMapper::toImageResponse);
 
+    }
+
+    @Override
+    public Page<ImageResponse> getDeletedImages(
+            int page,
+            int size,
+            String search,
+            String sortBy,
+            String direction) {
+
+        User user = getLoggedInUser();
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ImageMetadata> images;
+
+        if (search == null || search.isBlank()) {
+
+            images = metadataService.findDeletedByUser(user, pageable);
+
+        } else {
+
+            images = metadataService.findDeletedByUserAndSearch(
+                    user,
+                    search,
+                    pageable);
+        }
+
+        return images.map(imageMapper::toImageResponse);
+    }
+
+    @Override
+    public void restoreImage(Long imageId) {
+
+        User user = getLoggedInUser();
+
+        ImageMetadata metadata = metadataService
+                .findByIdAndUser(imageId, user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                MessageConstants.IMAGE_NOT_FOUND));
+
+        metadata.setDeleted(false);
+        metadata.setDeletedAt(null);
+
+        metadataService.save(metadata);
+
+        logger.info(
+                "User '{}' restored image '{}'",
+                user.getEmail(),
+                metadata.getOriginalFileName());
+    }
+
+    @Override
+    public void permanentlyDelete(Long imageId) {
+
+        User user = getLoggedInUser();
+
+        ImageMetadata metadata = metadataService
+                .findByIdAndUser(imageId, user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                MessageConstants.IMAGE_NOT_FOUND));
+
+        storageService.delete(metadata.getS3Key());
+
+        metadataService.permanentDelete(metadata);
+
+        logger.info(
+                "User '{}' permanently deleted image '{}'",
+                user.getEmail(),
+                metadata.getOriginalFileName());
     }
 
     @Override

@@ -1,10 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.config.VersionConfig;
-import com.example.demo.dto.DashboardStatsDto;
-import com.example.demo.dto.ImageResponse;
-import com.example.demo.dto.ImageUploadResponse;
-import com.example.demo.dto.ResponceDto;
+import com.example.demo.dto.*;
 import com.example.demo.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,6 +89,42 @@ public class ImageUploadController {
                 imageUploadService.getDashboardStats()
         );
 
+    }
+
+    @GetMapping("/recycle-bin")
+    public ResponseEntity<Page<ImageResponse>> getDeletedImages(
+
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "uploadedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        return ResponseEntity.ok(
+                imageUploadService.getDeletedImages(
+                        page,
+                        size,
+                        search,
+                        sortBy,
+                        direction));
+    }
+
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<ApiResponse> restoreImage(
+            @PathVariable Long id) {
+
+        imageUploadService.restoreImage(id);
+
+        return ResponseEntity.ok(new ApiResponse("Image restored successfully."));
+    }
+
+    @DeleteMapping("/permanent/{id}")
+    public ResponseEntity<ApiResponse> permanentlyDelete(
+            @PathVariable Long id) {
+
+        imageUploadService.permanentlyDelete(id);
+
+        return ResponseEntity.ok(new ApiResponse("Image permanently deleted."));
     }
 
 

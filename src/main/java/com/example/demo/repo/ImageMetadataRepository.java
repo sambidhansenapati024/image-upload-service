@@ -8,23 +8,33 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ImageMetadataRepository
         extends JpaRepository<ImageMetadata, Long> {
 
-    Page<ImageMetadata> findByUser(
+    Page<ImageMetadata> findByUserAndDeletedFalse(
             User user,
-            Pageable pageable
-    );
+            Pageable pageable);
 
-    Page<ImageMetadata> findByUserAndOriginalFileNameContainingIgnoreCase(
+    Page<ImageMetadata> findByUserAndDeletedFalseAndOriginalFileNameContainingIgnoreCase(
             User user,
             String search,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     ImageMetadata findByS3Key(String s3Key);
 
-    List<ImageMetadata> findByUser(User user);
+    List<ImageMetadata> findByUserAndDeletedFalse(User user);
+
+    Page<ImageMetadata> findByUserAndDeletedTrue(
+            User user,
+            Pageable pageable);
+
+    Page<ImageMetadata> findByUserAndDeletedTrueAndOriginalFileNameContainingIgnoreCase(
+            User user,
+            String search,
+            Pageable pageable);
+
+    Optional<ImageMetadata> findByIdAndUser(Long id, User user);
 
 }

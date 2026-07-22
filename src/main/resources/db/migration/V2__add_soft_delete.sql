@@ -1,0 +1,5 @@
+ALTER TABLE image_metadata
+ADD COLUMN deleted BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE image_metadata
+ADD COLUMN deleted_at TIMESTAMP;

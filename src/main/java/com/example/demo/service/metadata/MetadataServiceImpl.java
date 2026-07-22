@@ -1,10 +1,13 @@
 package com.example.demo.service.metadata;
 
+import com.example.demo.dto.ImageResponse;
 import com.example.demo.entity.ImageMetadata;
 import com.example.demo.entity.User;
 import com.example.demo.repo.ImageMetadataRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,7 +37,7 @@ public class MetadataServiceImpl
             User user,
             Pageable pageable) {
 
-        return repository.findByUser(user, pageable);
+        return repository.findByUserAndDeletedFalse(user, pageable);
 
     }
 
@@ -44,7 +47,7 @@ public class MetadataServiceImpl
             String search,
             Pageable pageable) {
 
-        return repository.findByUserAndOriginalFileNameContainingIgnoreCase(
+        return repository.findByUserAndDeletedFalseAndOriginalFileNameContainingIgnoreCase(
                 user,
                 search,
                 pageable);
@@ -59,16 +62,116 @@ public class MetadataServiceImpl
     }
 
     @Override
-    public void delete(ImageMetadata image) {
+    public List<ImageMetadata> findByUser(User user) {
 
-        repository.delete(image);
+        return repository.findByUserAndDeletedFalse(user);
 
     }
 
     @Override
-    public List<ImageMetadata> findByUser(User user) {
+    public Page<ImageMetadata> findDeletedByUser(
+            User user,
+            Pageable pageable) {
 
-        return repository.findByUser(user);
+        return repository.findByUserAndDeletedTrue(user, pageable);
+    }
 
+    @Override
+    public Page<ImageMetadata> findDeletedByUserAndSearch(
+            User user,
+            String search,
+            Pageable pageable) {
+
+        return repository
+                .findByUserAndDeletedTrueAndOriginalFileNameContainingIgnoreCase(
+                        user,
+                        search,
+                        pageable);
+    }
+
+    @Override
+    public Optional<ImageMetadata> findByIdAndUser(Long id, User user) {
+        return repository.findByIdAndUser(id, user);
+    }
+
+//    @Override
+//    public Page<ImageResponse> getDeletedImages(
+//            int page,
+//            int size,
+//            String search,
+//            String sortBy,
+//            String direction) {
+//
+//        User user = getLoggedInUser();
+//
+//        Sort sort = direction.equalsIgnoreCase("desc")
+//                ? Sort.by(sortBy).descending()
+//                : Sort.by(sortBy).ascending();
+//
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//
+//        Page<ImageMetadata> images;
+//
+//        if (search == null || search.isBlank()) {
+//
+//            images = repository.findDeletedByUser(user, pageable);
+//
+//        } else {
+//
+//            images = metadataService.findDeletedByUserAndSearch(
+//                    user,
+//                    search,
+//                    pageable);
+//        }
+//
+//        return images.map(imageMapper::toImageResponse);
+//    }
+
+//    @Override
+//    public void restoreImage(Long imageId) {
+//
+//        User user = getLoggedInUser();
+//
+//        ImageMetadata metadata = metadataService
+//                .findByIdAndUser(imageId, user)
+//                .orElseThrow(() ->
+//                        new ResourceNotFoundException(
+//                                MessageConstants.IMAGE_NOT_FOUND));
+//
+//        metadata.setDeleted(false);
+//        metadata.setDeletedAt(null);
+//
+//        metadataService.save(metadata);
+//
+//        logger.info(
+//                "User '{}' restored image '{}'",
+//                user.getEmail(),
+//                metadata.getOriginalFileName());
+//    }
+
+//    @Override
+//    public void permanentlyDelete(Long imageId) {
+//
+//        User user = getLoggedInUser();
+//
+//        ImageMetadata metadata = metadataService
+//                .findByIdAndUser(imageId, user)
+//                .orElseThrow(() ->
+//                        new ResourceNotFoundException(
+//                                MessageConstants.IMAGE_NOT_FOUND));
+//
+//        storageService.delete(metadata.getS3Key());
+//
+//        metadataService.permanentDelete(metadata);
+//
+//        logger.info(
+//                "User '{}' permanently deleted image '{}'",
+//                user.getEmail(),
+//                metadata.getOriginalFileName());
+//    }
+
+    @Override
+    public void permanentDelete(ImageMetadata image) {
+        repository.delete(image);
     }
 }
