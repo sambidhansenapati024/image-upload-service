@@ -4,7 +4,9 @@ import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.LoginResponse;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.dto.RegisterResponse;
+import com.example.demo.entity.Profile;
 import com.example.demo.entity.User;
+import com.example.demo.repo.ProfileRepository;
 import com.example.demo.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,10 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private ProfileRepository profileRepository;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -41,7 +47,12 @@ public class AuthServiceImpl implements AuthService {
         // Encrypt password
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        Profile profile = new Profile();
+        profile.setUser(savedUser);
+
+        profileRepository.save(profile);
 
         return new RegisterResponse(true, "User Registered Successfully");
     }
