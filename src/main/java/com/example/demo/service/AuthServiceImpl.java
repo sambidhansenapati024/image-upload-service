@@ -1,13 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.LoginResponse;
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.dto.RegisterResponse;
+import com.example.demo.dto.*;
 import com.example.demo.entity.Profile;
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserSession;
 import com.example.demo.repo.ProfileRepository;
 import com.example.demo.repo.UserRepository;
+import com.example.demo.repo.UserSessionRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,12 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private UserSessionRepository userSessionRepository;
+
+    @Autowired
+    private DeviceInfoService deviceInfoService;
 
     @Autowired
     private ProfileRepository profileRepository;
@@ -58,14 +64,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request,  HttpServletRequest httpRequest) {
         System.out.println("Request Email: " + request.getEmail());
         System.out.println("Request Password: " + request.getPassword());
 
 
         Optional<User> optionalUser =
                 userRepository.findByEmail(request.getEmail());
-        System.out.println("User Found: " + optionalUser.isPresent());
         if (optionalUser.isEmpty()) {
             return new LoginResponse(false,
                     "Invalid Email or Password",
@@ -73,8 +78,6 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = optionalUser.get();
-        System.out.println("DB Email: " + user.getEmail());
-        System.out.println("DB Password: " + user.getPassword());
 
         if (!passwordEncoder.matches(
                 request.getPassword(),
@@ -85,7 +88,30 @@ public class AuthServiceImpl implements AuthService {
                     null);
         }
 
-        String token = jwtService.generateToken(user.getEmail());
+        DeviceInfo deviceInfo =
+                deviceInfoService.extract(httpRequest);
+
+        UserSession session = new UserSession();
+
+        session.setUser(user);
+
+        session.setBrowser(deviceInfo.getBrowser());
+
+        session.setOperatingSystem(deviceInfo.getOperatingSystem());
+
+        session.setDevice(deviceInfo.getDevice());
+
+        session.setIpAddress(deviceInfo.getIpAddress());
+
+// We'll populate this later using GeoIP
+        session.setLocation(null);
+
+        userSessionRepository.save(session);
+
+        String token = jwtService.generateToken(
+                user.getEmail(),
+                session.getSessionId().toString()
+        );
 
         return new LoginResponse(
                 true,

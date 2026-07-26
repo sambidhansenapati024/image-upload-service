@@ -1,5 +1,7 @@
 package com.example.demo.security;
 
+import com.example.demo.entity.UserSession;
+import com.example.demo.repo.UserSessionRepository;
 import com.example.demo.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,13 +20,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final UserSessionRepository userSessionRepository;
 
     public JwtAuthenticationFilter(
             JwtService jwtService,
-            CustomUserDetailsService userDetailsService) {
+            CustomUserDetailsService userDetailsService,
+            UserSessionRepository userSessionRepository) {
 
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.userSessionRepository = userSessionRepository;
     }
 
     @Override
@@ -48,7 +53,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        String sessionId = jwtService.extractSessionId(token);
         String email = jwtService.extractEmail(token);
+
+        UserSession session = userSessionRepository
+                .findBySessionId(java.util.UUID.fromString(sessionId))
+                .orElse(null);
+
+        if (session == null || !Boolean.TRUE.equals(session.getActive())) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        session.setLastActivity(java.time.LocalDateTime.now());
+
+        userSessionRepository.save(session);
 
         UserDetails user =
                 userDetailsService.loadUserByUsername(email);
