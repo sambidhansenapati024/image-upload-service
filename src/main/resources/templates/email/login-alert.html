@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>New Login Detected</title>
+</head>
+
+<body style="margin:0;padding:40px;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center">
+
+            <table width="600"
+                   cellpadding="0"
+                   cellspacing="0"
+                   style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.08);">
+
+                <tr>
+                    <td align="center"
+                        style="background:#2563eb;color:white;padding:30px;">
+
+                        <h1 style="margin:0;">☁ CloudVault</h1>
+
+                    </td>
+                </tr>
+
+                <tr>
+
+                    <td style="padding:40px;">
+
+                        <h2>New Sign-in Detected</h2>
+
+                        <p>
+                            Hi <strong th:text="${name}"></strong>,
+                        </p>
+
+                        <p>
+                            We detected a new login to your CloudVault account.
+                        </p>
+
+                        <table style="margin-top:20px;">
+
+                            <tr>
+                                <td><strong>Browser:</strong></td>
+                                <td th:text="${browser}"></td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Operating System:</strong></td>
+                                <td th:text="${os}"></td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Device:</strong></td>
+                                <td th:text="${device}"></td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>IP Address:</strong></td>
+                                <td th:text="${ip}"></td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Login Time:</strong></td>
+                                <td th:text="${time}"></td>
+                            </tr>
+
+                        </table>
+
+                        <p style="margin-top:30px;">
+                            If this was you, you can safely ignore this email.
+                        </p>
+
+                        <p>
+                            <strong>
+                                If you don't recognize this activity, change your password immediately.
+                            </strong>
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td
+                            style="background:#f8fafc;color:#64748b;text-align:center;padding:20px;font-size:13px;">
+
+                        © 2026 CloudVault
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+
+</html>

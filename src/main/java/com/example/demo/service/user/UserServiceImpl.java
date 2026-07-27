@@ -4,6 +4,7 @@ import com.example.demo.dto.ChangePasswordRequest;
 import com.example.demo.dto.SessionResponse;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserSession;
+import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.repo.UserSessionRepository;
 import com.example.demo.service.JwtService;
@@ -26,6 +27,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private NotificationService notificationService;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -82,6 +86,15 @@ public class UserServiceImpl implements UserService {
                 passwordEncoder.encode(request.getNewPassword()));
 
         userRepository.save(user);
+        try {
+
+            notificationService.sendPasswordChangedNotification(user);
+
+        } catch (Exception ex) {
+
+            System.out.println("Error");
+
+        }
 
 
     }

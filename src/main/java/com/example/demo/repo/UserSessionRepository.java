@@ -17,4 +17,11 @@ public interface UserSessionRepository
 
     List<UserSession> findByUserAndActiveTrueOrderByLoginTimeDesc(User user);
 
+    boolean existsByUserAndBrowserAndOperatingSystemAndDevice(
+            User user,
+            String browser,
+            String operatingSystem,
+            String device
+    );
+
 }

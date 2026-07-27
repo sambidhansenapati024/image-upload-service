@@ -4,20 +4,30 @@ import com.example.demo.dto.*;
 import com.example.demo.entity.Profile;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserSession;
+import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repo.ProfileRepository;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.repo.UserSessionRepository;
+import com.example.demo.service.user.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private UserSessionRepository userSessionRepository;
@@ -59,14 +69,21 @@ public class AuthServiceImpl implements AuthService {
         profile.setUser(savedUser);
 
         profileRepository.save(profile);
+        try {
+
+            notificationService.sendWelcomeNotification(user);
+
+        } catch (Exception ex) {
+
+           System.out.println("Error occure");
+
+        }
 
         return new RegisterResponse(true, "User Registered Successfully");
     }
 
     @Override
     public LoginResponse login(LoginRequest request,  HttpServletRequest httpRequest) {
-        System.out.println("Request Email: " + request.getEmail());
-        System.out.println("Request Password: " + request.getPassword());
 
 
         Optional<User> optionalUser =
@@ -91,6 +108,14 @@ public class AuthServiceImpl implements AuthService {
         DeviceInfo deviceInfo =
                 deviceInfoService.extract(httpRequest);
 
+        boolean knownDevice = userSessionRepository
+                .existsByUserAndBrowserAndOperatingSystemAndDevice(
+                        user,
+                        deviceInfo.getBrowser(),
+                        deviceInfo.getOperatingSystem(),
+                        deviceInfo.getDevice()
+                );
+
         UserSession session = new UserSession();
 
         session.setUser(user);
@@ -112,6 +137,24 @@ public class AuthServiceImpl implements AuthService {
                 user.getEmail(),
                 session.getSessionId().toString()
         );
+
+        if (!knownDevice) {
+
+            try {
+
+                notificationService.sendNewLoginNotification(user, session);
+
+            } catch (Exception ex) {
+
+                log.error(
+                        "Failed to send login notification to {}",
+                        user.getEmail(),
+                        ex
+                );
+
+            }
+
+        }
 
         return new LoginResponse(
                 true,

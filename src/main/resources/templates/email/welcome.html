@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to CloudVault</title>
+</head>
+
+<body style="margin:0;padding:0;background:#eef3f8;font-family:'Segoe UI',Arial,sans-serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+
+    <tr>
+
+        <td align="center">
+
+            <table role="presentation"
+                   width="640"
+                   cellpadding="0"
+                   cellspacing="0"
+                   style="background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.08);">
+
+                <!-- HEADER -->
+
+                <tr>
+
+                    <td align="center"
+                        style="padding:50px 30px;background:linear-gradient(135deg,#2563eb,#3b82f6);">
+
+                        <div style="font-size:60px;line-height:1;">
+                            ☁️
+                        </div>
+
+                        <h1 style="margin:20px 0 8px;color:#ffffff;font-size:36px;font-weight:700;">
+                            CloudVault
+                        </h1>
+
+                        <p style="margin:0;color:#dbeafe;font-size:17px;">
+                            Secure Cloud Storage for Everything You Value
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                <!-- BODY -->
+
+                <tr>
+
+                    <td style="padding:50px;">
+
+                        <h2 style="margin:0;color:#111827;font-size:30px;">
+                            Welcome aboard 👋
+                        </h2>
+
+                        <p style="margin:18px 0 0;color:#475569;font-size:17px;line-height:1.8;">
+
+                            Hello
+                            <strong th:text="${name}" style="color:#2563eb;"></strong>,
+
+                        </p>
+
+                        <p style="margin-top:20px;color:#475569;font-size:16px;line-height:1.8;">
+
+                            Your CloudVault account has been successfully created.
+
+                            You can now securely upload, organize, protect and access your files from anywhere in the world.
+
+                        </p>
+
+                        <!-- FEATURE BOX -->
+
+                        <table
+                                width="100%"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin:35px 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;">
+
+                            <tr>
+
+                                <td style="padding:28px;">
+
+                                    <h3 style="margin:0 0 20px;color:#0f172a;">
+                                        What you can do now
+                                    </h3>
+
+                                    <table width="100%">
+
+                                        <tr>
+
+                                            <td style="padding:8px 0;color:#334155;">
+                                                ✅ Upload unlimited images*
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="padding:8px 0;color:#334155;">
+                                                📂 Organize files into folders
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="padding:8px 0;color:#334155;">
+                                                🔒 Keep your files secure
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="padding:8px 0;color:#334155;">
+                                                🗑 Restore deleted files from Recycle Bin
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="padding:8px 0;color:#334155;">
+                                                ⚡ Access your files anytime
+                                            </td>
+
+                                        </tr>
+
+                                    </table>
+
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                        <!-- BUTTON -->
+
+                        <div style="text-align:center;margin:45px 0;">
+
+                            <a
+                                    href="http://localhost:4200/login"
+                                    style="
+display:inline-block;
+background:#2563eb;
+padding:16px 36px;
+border-radius:12px;
+color:#ffffff;
+text-decoration:none;
+font-size:16px;
+font-weight:600;
+box-shadow:0 8px 20px rgba(37,99,235,.35);">
+
+                                Login to CloudVault →
+
+                            </a>
+
+                        </div>
+
+                        <!-- SECURITY -->
+
+                        <table
+                                width="100%"
+                                style="
+background:#eff6ff;
+border-left:5px solid #2563eb;
+border-radius:10px;">
+
+                            <tr>
+
+                                <td style="padding:22px;">
+
+                                    <strong style="color:#1d4ed8;">
+                                        Security Tip
+                                    </strong>
+
+                                    <p style="margin:10px 0 0;color:#475569;line-height:1.7;">
+
+                                        Never share your password with anyone.
+                                        CloudVault will never ask you for your password via email.
+
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                        <p style="margin-top:35px;color:#64748b;font-size:15px;line-height:1.7;">
+
+                            If you didn't create this account, please ignore this email.
+
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                <!-- FOOTER -->
+
+                <tr>
+
+                    <td
+                            style="
+background:#0f172a;
+padding:35px;
+text-align:center;">
+
+                        <h3 style="margin:0;color:white;">
+                            CloudVault
+                        </h3>
+
+                        <p style="margin:15px 0;color:#94a3b8;font-size:14px;">
+                            Secure • Reliable • Always Available
+                        </p>
+
+                        <p style="margin-top:25px;color:#64748b;font-size:13px;line-height:1.8;">
+
+                            © 2026 CloudVault. All rights reserved.
+
+                            <br>
+
+                            This is an automated email. Please do not reply.
+
+                        </p>
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </td>
+
+    </tr>
+
+</table>
+
+</body>
+
+</html>
