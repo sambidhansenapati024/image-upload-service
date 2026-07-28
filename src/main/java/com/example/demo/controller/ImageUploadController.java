@@ -127,5 +127,43 @@ public class ImageUploadController {
         return ResponseEntity.ok(new ApiResponse("Image permanently deleted."));
     }
 
+    @PutMapping("/replace/{imageId}")
+    public ResponseEntity<ImageResponse> replaceImage(
+
+            @PathVariable Long imageId,
+
+            @RequestParam MultipartFile file
+
+    ) throws IOException {
+
+        return ResponseEntity.ok(
+
+                imageUploadService.replaceImage(
+                        imageId,
+                        file)
+
+        );
+
+    }
+
+    @PostMapping("/copy/{imageId}")
+    public ResponseEntity<ImageResponse> copyImage(
+
+            @PathVariable Long imageId,
+
+            @RequestParam MultipartFile file
+
+    ) throws IOException {
+
+        return ResponseEntity.ok(
+
+                imageUploadService.copyImage(
+                        imageId,
+                        file)
+
+        );
+
+    }
+
 
 }
