@@ -39,4 +39,14 @@ public interface ImageUploadService {
     void restoreImage(Long imageId);
 
     void permanentlyDelete(Long imageId);
+
+    ImageResponse replaceImage(
+            Long imageId,
+            MultipartFile file
+    ) throws IOException;
+
+    ImageResponse copyImage(
+            Long imageId,
+            MultipartFile file
+    ) throws IOException;
 }

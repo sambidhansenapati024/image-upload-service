@@ -249,6 +249,90 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     }
 
     @Override
+    public ImageResponse replaceImage(
+            Long imageId,
+            MultipartFile file
+    ) throws IOException {
+
+        User user = getLoggedInUser();
+
+        ImageMetadata metadata = metadataService
+                .findByIdAndUser(imageId, user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                MessageConstants.IMAGE_NOT_FOUND));
+
+        storageService.delete(metadata.getS3Key());
+        StorageUploadResponse storageResponse =
+                storageService.upload(file);
+
+        metadata.setS3Key(storageResponse.getKey());
+
+        metadata.setImageUrl(storageResponse.getUrl());
+
+        metadata.setOriginalFileName(file.getOriginalFilename());
+
+        metadata.setFileSize(file.getSize());
+
+        metadata.setContentType(file.getContentType());
+
+        metadata.setUploadedAt(LocalDateTime.now());
+
+        ImageMetadata updatedMetadata = metadataService.save(metadata);
+
+        logger.info(
+                "User '{}' replaced image '{}'",
+                user.getEmail(),
+                updatedMetadata.getOriginalFileName());
+
+        return imageMapper.toImageResponse(updatedMetadata);
+    }
+
+    @Override
+    public ImageResponse copyImage(
+            Long imageId,
+            MultipartFile file
+    ) throws IOException {
+
+        User user = getLoggedInUser();
+
+        ImageMetadata originalImage = metadataService
+                .findByIdAndUser(imageId, user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                MessageConstants.IMAGE_NOT_FOUND));
+
+        StorageUploadResponse storageResponse =
+                storageService.upload(file);
+
+        ImageMetadata metadata = new ImageMetadata();
+
+        metadata.setOriginalFileName(file.getOriginalFilename());
+
+        metadata.setS3Key(storageResponse.getKey());
+
+        metadata.setImageUrl(storageResponse.getUrl());
+
+        metadata.setFileSize(file.getSize());
+
+        metadata.setContentType(file.getContentType());
+
+        metadata.setUploadedAt(LocalDateTime.now());
+
+        metadata.setUser(originalImage.getUser());
+
+        ImageMetadata savedMetadata = metadataService.save(metadata);
+
+        logger.info(
+                "User '{}' created a copy of image '{}'",
+                user.getEmail(),
+                savedMetadata.getOriginalFileName());
+
+        return imageMapper.toImageResponse(savedMetadata);
+    }
+
+
+    @Override
     public DashboardStatsDto getDashboardStats() {
 
         User user = getLoggedInUser();
