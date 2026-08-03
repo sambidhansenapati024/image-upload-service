@@ -3,9 +3,11 @@ package com.example.demo.service.password;
 import com.example.demo.dto.ResetPasswordRequests;
 import com.example.demo.entity.PasswordResetToken;
 import com.example.demo.entity.User;
+import com.example.demo.enums.ActionType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repo.PasswordResetTokenRepository;
 import com.example.demo.repo.UserRepository;
+import com.example.demo.service.pushNtification.ActivityLogService;
 import com.example.demo.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +22,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
     @Autowired
     private  PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @Autowired
     private UserRepository userRepository;
@@ -73,6 +78,13 @@ private PasswordEncoder passwordEncoder;
                     token
             );
 
+            activityLogService.logActivity(
+                    user.getEmail(),
+                    ActionType.PASSWORD_CHANGED,
+                    "Your account password was changed successfully.",
+                    null
+            );
+
         } catch (Exception ex) {
 
             System.out.println("Error");
@@ -105,6 +117,13 @@ private PasswordEncoder passwordEncoder;
         passwordResetToken.setUsed(true);
 
         passwordResetTokenRepository.save(passwordResetToken);
+
+        activityLogService.logActivity(
+                user.getEmail(),
+                ActionType.PASSWORD_RESET,
+                "Your password was reset successfully.",
+                null
+        );
 
     }
 }

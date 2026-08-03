@@ -3,10 +3,12 @@ package com.example.demo.service;
 import com.example.demo.dto.ImageResponse;
 import com.example.demo.dto.ImageUploadResponse;
 import com.example.demo.dto.storage.StorageUploadResponse;
+import com.example.demo.enums.ActionType;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.UnauthorizedOperationException;
 import com.example.demo.mapper.ImageMapper;
 import com.example.demo.service.dashboard.DashboardService;
+import com.example.demo.service.pushNtification.ActivityLogService;
 import com.example.demo.service.storage.StorageService;
 import com.example.demo.util.MessageConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,9 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     @Autowired
     private ImageMapper imageMapper;
 
+    @Autowired
+    private ActivityLogService activityLogService;
+
     @Override
     public List<ImageUploadResponse> imageUpload(MultipartFile[] files) throws IOException {
 
@@ -92,6 +97,12 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 
             ImageMetadata savedMetadata =
                     metadataService.save(metadata);
+            activityLogService.logActivity(
+                    user.getEmail(),
+                    ActionType.IMAGE_UPLOAD,
+                    "Uploaded image '" + savedMetadata.getOriginalFileName() + "'",
+                    savedMetadata.getId()
+            );
 
             logger.info(
                     "User '{}' uploaded image '{}'",
@@ -130,6 +141,13 @@ public class ImageUploadServiceImpl implements ImageUploadService {
         metadata.setDeletedAt(LocalDateTime.now());
 
         metadataService.save(metadata);
+
+        activityLogService.logActivity(
+                loggedInUser.getEmail(),
+                ActionType.IMAGE_TRASHED,
+                "Moved image '" + metadata.getOriginalFileName() + "' to recycle bin",
+                metadata.getId()
+        );
 
         logger.info(
                 "User '{}' moved image '{}' to recycle bin",
@@ -221,6 +239,13 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 
         metadataService.save(metadata);
 
+        activityLogService.logActivity(
+                user.getEmail(),
+                ActionType.IMAGE_RESTORE,
+                "Restore image '" + metadata.getOriginalFileName() + "' from recycle bin ",
+                metadata.getId()
+        );
+
         logger.info(
                 "User '{}' restored image '{}'",
                 user.getEmail(),
@@ -241,6 +266,13 @@ public class ImageUploadServiceImpl implements ImageUploadService {
         storageService.delete(metadata.getS3Key());
 
         metadataService.permanentDelete(metadata);
+
+        activityLogService.logActivity(
+                user.getEmail(),
+                ActionType.IMAGE_DELETE,
+                "Delete image '" + metadata.getOriginalFileName() + "' From recycle bin",
+                metadata.getId()
+        );
 
         logger.info(
                 "User '{}' permanently deleted image '{}'",
@@ -284,8 +316,16 @@ public class ImageUploadServiceImpl implements ImageUploadService {
                 "User '{}' replaced image '{}'",
                 user.getEmail(),
                 updatedMetadata.getOriginalFileName());
+        activityLogService.logActivity(
+                user.getEmail(),
+                ActionType.IMAGE_EDIT,
+                "After Edit you Replace the '" + metadata.getOriginalFileName() + "' image.",
+                metadata.getId()
+        );
 
         return imageMapper.toImageResponse(updatedMetadata);
+
+
     }
 
     @Override
@@ -327,7 +367,12 @@ public class ImageUploadServiceImpl implements ImageUploadService {
                 "User '{}' created a copy of image '{}'",
                 user.getEmail(),
                 savedMetadata.getOriginalFileName());
-
+        activityLogService.logActivity(
+                user.getEmail(),
+                ActionType.IMAGE_EDIT,
+                "After Edit you Save the new Image",
+                metadata.getId()
+        );
         return imageMapper.toImageResponse(savedMetadata);
     }
 

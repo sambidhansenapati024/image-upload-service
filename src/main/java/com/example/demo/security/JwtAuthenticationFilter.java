@@ -48,28 +48,52 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = header.substring(7);
 
-        if (!jwtService.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
+        boolean valid = jwtService.isTokenValid(token);
+
+        if (!valid) {
+
+            response.reset();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            response.getWriter().write("{\"message\":\"JWT expired\"}");
+            response.getWriter().flush();
+            response.flushBuffer();
             return;
         }
 
         String sessionId = jwtService.extractSessionId(token);
+
         String email = jwtService.extractEmail(token);
 
         UserSession session = userSessionRepository
                 .findBySessionId(java.util.UUID.fromString(sessionId))
                 .orElse(null);
 
-        if (session == null || !Boolean.TRUE.equals(session.getActive())) {
+        if (session == null) {
+
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"message\":\"Session not found\"}");
+            response.getWriter().flush();
+
             return;
         }
+
+
+        if (!Boolean.TRUE.equals(session.getActive())) {
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"message\":\"Session inactive\"}");
+            response.getWriter().flush();
+            return;
+        }
+
         session.setLastActivity(java.time.LocalDateTime.now());
 
         userSessionRepository.save(session);
 
-        UserDetails user =
-                userDetailsService.loadUserByUsername(email);
+        UserDetails user = userDetailsService.loadUserByUsername(email);
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
@@ -81,8 +105,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new WebAuthenticationDetailsSource()
                         .buildDetails(request));
 
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }

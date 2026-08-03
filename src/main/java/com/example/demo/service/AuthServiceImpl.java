@@ -4,10 +4,12 @@ import com.example.demo.dto.*;
 import com.example.demo.entity.Profile;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserSession;
+import com.example.demo.enums.ActionType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repo.ProfileRepository;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.repo.UserSessionRepository;
+import com.example.demo.service.pushNtification.ActivityLogService;
 import com.example.demo.service.user.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class AuthServiceImpl implements AuthService {
             LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @Autowired
     private NotificationService notificationService;
@@ -64,6 +69,12 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User savedUser = userRepository.save(user);
+        activityLogService.logActivity(
+                savedUser.getEmail(),
+                ActionType.WELCOME,
+                "🎉 Welcome to CloudVault! Start uploading your memories securely.",
+                null
+        );
 
         Profile profile = new Profile();
         profile.setUser(savedUser);
@@ -140,19 +151,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (!knownDevice) {
 
-            try {
-
-                notificationService.sendNewLoginNotification(user, session);
-
-            } catch (Exception ex) {
-
-                log.error(
-                        "Failed to send login notification to {}",
-                        user.getEmail(),
-                        ex
-                );
-
-            }
+            activityLogService.logNewLogin(user.getEmail(), session);
 
         }
 
