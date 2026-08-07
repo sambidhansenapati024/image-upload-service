@@ -16,4 +16,11 @@ public interface EmailService {
             String template,
             Map<String, Object> variables
     );
+
+    void sendHtmlEmailAsync(
+            String to,
+            String subject,
+            String template,
+            Map<String, Object> variables
+    );
 }
