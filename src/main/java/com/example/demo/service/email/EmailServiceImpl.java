@@ -8,11 +8,17 @@ import org.thymeleaf.TemplateEngine;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.thymeleaf.context.Context;
+import org.springframework.scheduling.annotation.Async;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 @Service
 public class EmailServiceImpl implements EmailService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private final JavaMailSender mailSender;
 
@@ -79,6 +85,35 @@ public class EmailServiceImpl implements EmailService {
         } catch (MessagingException e) {
 
             throw new RuntimeException("Failed to send email", e);
+
+        }
+
+    }
+
+    @Async("emailTaskExecutor")
+    @Override
+    public void sendHtmlEmailAsync(
+            String to,
+            String subject,
+            String template,
+            Map<String, Object> variables) {
+
+        try {
+
+            sendHtmlEmail(
+                    to,
+                    subject,
+                    template,
+                    variables
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Failed to send email to {}",
+                    to,
+                    ex
+            );
 
         }
 

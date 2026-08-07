@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>OTP Verification</title>
+
+    <style>
+
+        body{
+            margin:0;
+            padding:0;
+            background:#f4f6fb;
+            font-family:Arial,Helvetica,sans-serif;
+        }
+
+        .wrapper{
+            width:100%;
+            padding:40px 0;
+        }
+
+        .card{
+            max-width:600px;
+            margin:auto;
+            background:white;
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow:0 15px 40px rgba(0,0,0,.08);
+        }
+
+        .header{
+
+            background:#2563eb;
+            padding:35px;
+            text-align:center;
+            color:white;
+
+        }
+
+        .shield{
+
+            font-size:42px;
+            margin-bottom:12px;
+
+        }
+
+        h1{
+
+            margin:0;
+            font-size:28px;
+
+        }
+
+        .content{
+
+            padding:40px;
+
+        }
+
+        .subtitle{
+
+            color:#555;
+            font-size:16px;
+            line-height:1.7;
+            text-align:center;
+
+        }
+
+        .otp-box{
+
+            margin:35px auto;
+            width:220px;
+            letter-spacing:18px;
+            font-size:42px;
+            font-weight:bold;
+            text-align:center;
+            padding:18px;
+            border-radius:12px;
+            background:#eef4ff;
+            color:#2563eb;
+            border:2px dashed #2563eb;
+
+        }
+
+        .expiry{
+
+            text-align:center;
+            color:#d97706;
+            font-weight:600;
+            margin-top:10px;
+
+        }
+
+        .footer{
+
+            margin-top:40px;
+            font-size:13px;
+            color:#888;
+            text-align:center;
+            line-height:1.7;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div class="card">
+
+        <div class="header">
+
+            <div class="shield">🛡️</div>
+
+            <h1 th:text="${title}"></h1>
+
+        </div>
+
+        <div class="content">
+
+            <p class="subtitle" th:text="${subtitle}"></p>
+
+            <div class="otp-box"
+                 th:text="${otp}">
+            </div>
+
+            <p class="expiry">
+
+                Valid for
+                <span th:text="${expiry}"></span>
+                seconds.
+
+            </p>
+
+            <div class="footer">
+
+                If you did not request this verification code,
+                you can safely ignore this email.
+
+                <br><br>
+
+                © 2026 Your Company
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

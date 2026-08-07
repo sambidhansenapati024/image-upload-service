@@ -33,7 +33,7 @@ public class NotificationServiceImpl
 
         variables.put("name", user.getFullName());
 
-        emailService.sendHtmlEmail(
+        emailService.sendHtmlEmailAsync(
 
                 user.getEmail(),
 
@@ -44,7 +44,6 @@ public class NotificationServiceImpl
                 variables
 
         );
-
     }
 
     @Override

@@ -5,12 +5,16 @@ import com.example.demo.entity.Profile;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserSession;
 import com.example.demo.enums.ActionType;
+import com.example.demo.enums.OtpPurpose;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repo.ProfileRepository;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.repo.UserSessionRepository;
+import com.example.demo.service.otp.OtpService;
 import com.example.demo.service.pushNtification.ActivityLogService;
+import com.example.demo.service.reids.RedisService;
 import com.example.demo.service.user.UserServiceImpl;
+import com.example.demo.util.RedisKeys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,6 +47,12 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private ProfileRepository profileRepository;
 
+    @Autowired
+    protected RedisService redisService;
+
+    @Autowired
+    private OtpService otpService;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -54,19 +64,38 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public RegisterResponse register(RegisterRequest request) {
+    public RegisterResponse register(
+            CompleteRegistrationRequest request
+    ) {
+        OtpVerificationResult result =
+                otpService.verifyOtp(
+                        request.getEmail(),
+                        request.getOtp()
+                );
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (!result.isSuccess()) {
+
+            return new RegisterResponse(
+                    false,
+                    getOtpErrorMessage(result)
+            );
+
+        }
+
+        RegisterRequest registerRequest =
+                result.getRegisterRequest();
+
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return new RegisterResponse(false, "Email already exists");
         }
 
         User user = new User();
 
-        user.setFullName(request.getFullName());
-        user.setEmail(request.getEmail());
+        user.setFullName(registerRequest.getFullName());
+        user.setEmail(registerRequest.getEmail());
 
         // Encrypt password
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(registerRequest.getPassword());
 
         User savedUser = userRepository.save(user);
         activityLogService.logActivity(
@@ -89,6 +118,13 @@ public class AuthServiceImpl implements AuthService {
            System.out.println("Error occure");
 
         }
+
+        redisService.delete(
+                RedisKeys.otp(
+                        registerRequest.getEmail(),
+                        OtpPurpose.REGISTER
+                )
+        );
 
         return new RegisterResponse(true, "User Registered Successfully");
     }
@@ -161,4 +197,24 @@ public class AuthServiceImpl implements AuthService {
                 token
         );
     }
+
+    private String getOtpErrorMessage(OtpVerificationResult result) {
+
+        switch (result.getErrorCode()) {
+
+            case OTP_EXPIRED:
+                return "OTP has expired.";
+
+            case INVALID_OTP:
+                return "Invalid OTP. Remaining attempts: "
+                        + result.getRemainingAttempts();
+
+            case MAX_ATTEMPTS_EXCEEDED:
+                return "Maximum OTP attempts exceeded.";
+
+            default:
+                return "OTP verification failed.";
+        }
+    }
+
 }
