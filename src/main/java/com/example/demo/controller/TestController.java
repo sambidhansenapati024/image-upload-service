@@ -1,35 +1,43 @@
-package com.example.demo.controller;
-
-import com.example.demo.service.email.EmailService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
-@RestController
-@RequestMapping("/test")
-public class TestController {
-
-    private final EmailService emailService;
-
-    public TestController(EmailService emailService) {
-        this.emailService = emailService;
-    }
-
-    @PostMapping("/email")
-    public String sendTestEmail(@RequestParam String to) {
-
-        Map<String, Object> variables = new HashMap<>();
-
-        variables.put("name", "Sambidhan");
-
-        emailService.sendHtmlEmail(
-                to,
-                "Welcome to CloudVault",
-                "email/welcome",
-                variables
-        );
-
-        return "Email sent successfully.";
-    }
-}
+//package com.example.demo.controller;
+//
+//import com.example.demo.enums.OtpPurpose;
+//import com.example.demo.model.OtpSession;
+//import com.example.demo.service.reids.RedisService;
+//import com.example.demo.util.OtpGenerator;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.RestController;
+//
+//@RestController
+//public class TestController {
+//
+//    private final RedisService redisService;
+//
+//    public TestController(RedisService redisService) {
+//        this.redisService = redisService;
+//    }
+//
+//    @GetMapping("/redis-test")
+//    public OtpSession test() {
+//
+//        OtpSession session = new OtpSession();
+//
+//        session.setEmail("test@gmail.com");
+//        session.setOtp("1234");
+//        session.setAttempts(0);
+//        session.setPurpose(OtpPurpose.LOGIN);
+//
+//        redisService.save("otp:test", session, 60);
+//
+//        return redisService.get("otp:test", OtpSession.class);
+//
+//    }
+//
+//    @GetMapping("/otp")
+//    public String otp() {
+//
+//        return OtpGenerator.generateOtp();
+//
+//    }
+//
+//
+//}
