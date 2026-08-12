@@ -61,7 +61,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:2626",
-                "http://13.127.244.157:2626"
+                "http://3.111.253.238:2626"
         ));
 
         configuration.setAllowedMethods(List.of(
