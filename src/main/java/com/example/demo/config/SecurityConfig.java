@@ -61,7 +61,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:2626",
-                "http://cloudv.net.in"
+                "https://cloudv.net.in"
         ));
 
         configuration.setAllowedMethods(List.of(
