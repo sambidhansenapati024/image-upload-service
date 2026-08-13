@@ -49,6 +49,18 @@ public class UserSession {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "refresh_token_hash")
+    private String refreshTokenHash;
+
+    @Column(name = "refresh_token_expires_at")
+    private LocalDateTime refreshTokenExpiresAt;
+
+    @Column(name = "refresh_token_jti")
+    private String refreshTokenJti;
+
+    @Column(name = "refresh_token_rotation_count")
+    private Integer refreshTokenRotationCount;
+
     public UserSession() {
     }
 
@@ -74,6 +86,38 @@ public class UserSession {
 
         updatedAt = LocalDateTime.now();
 
+    }
+
+    public String getRefreshTokenHash() {
+        return refreshTokenHash;
+    }
+
+    public void setRefreshTokenHash(String refreshTokenHash) {
+        this.refreshTokenHash = refreshTokenHash;
+    }
+
+    public LocalDateTime getRefreshTokenExpiresAt() {
+        return refreshTokenExpiresAt;
+    }
+
+    public void setRefreshTokenExpiresAt(LocalDateTime refreshTokenExpiresAt) {
+        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+    }
+
+    public String getRefreshTokenJti() {
+        return refreshTokenJti;
+    }
+
+    public void setRefreshTokenJti(String refreshTokenJti) {
+        this.refreshTokenJti = refreshTokenJti;
+    }
+
+    public Integer getRefreshTokenRotationCount() {
+        return refreshTokenRotationCount;
+    }
+
+    public void setRefreshTokenRotationCount(Integer refreshTokenRotationCount) {
+        this.refreshTokenRotationCount = refreshTokenRotationCount;
     }
 
     public Long getId() {

@@ -1,16 +1,16 @@
 package com.example.demo.dto;
 
-public class LoginResponse {
+public class RefreshTokenResponse {
 
     private boolean success;
     private String message;
     private String token;
     private String refreshToken;
 
-    public LoginResponse() {
+    public RefreshTokenResponse() {
     }
 
-    public LoginResponse(
+    public RefreshTokenResponse(
             boolean success,
             String message,
             String token,
