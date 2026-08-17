@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Support Query Received</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+        }
+
+        .email-container {
+            max-width: 650px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background-color: #0f172a;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            color: #0f172a;
+        }
+
+        .details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .details tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .details td {
+            padding: 12px 8px;
+            vertical-align: top;
+        }
+
+        .details td:first-child {
+            width: 150px;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .query-id-box {
+            margin: 25px 0;
+            padding: 20px;
+            text-align: center;
+            background-color: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .query-id-label {
+            display: block;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .query-id {
+            font-size: 26px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .query-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-left: 4px solid #0f172a;
+            border-radius: 6px;
+        }
+
+        .query-box-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        .query-text {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .info-box {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            padding: 20px 30px;
+            background-color: #f8fafc;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="email-container">
+
+    <!-- Header -->
+
+    <div class="header">
+
+        <h1>
+            Support Query Received
+        </h1>
+
+        <p>
+            CloudVault Support
+        </p>
+
+    </div>
+
+
+    <!-- Content -->
+
+    <div class="content">
+
+        <h2>
+            Thank you for contacting us,
+            <span th:text="${userName}">
+                User
+            </span>!
+        </h2>
+
+        <p>
+            We have successfully received your support query.
+            Our support team has been notified and will review
+            your request.
+        </p>
+
+
+        <!-- Query ID -->
+
+        <div class="query-id-box">
+
+            <span class="query-id-label">
+                Your Query ID
+            </span>
+
+            <span class="query-id">
+                #<span th:text="${queryId}">
+                    10008700
+                </span>
+            </span>
+
+        </div>
+
+
+        <!-- Query Details -->
+
+        <table class="details">
+
+            <tr>
+
+                <td>
+                    Query Type
+                </td>
+
+                <td th:text="${queryType}">
+                    PASSWORD
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    Status
+                </td>
+
+                <td th:text="${status}">
+                    OPEN
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    Submitted At
+                </td>
+
+                <td th:text="${createdAt}">
+                    2026-08-14 15:00
+                </td>
+
+            </tr>
+
+        </table>
+
+
+        <!-- User Query -->
+
+        <div class="query-box">
+
+            <div class="query-box-title">
+                Your Query
+            </div>
+
+            <div
+                    class="query-text"
+                    th:text="${query}">
+
+                I forgot my password and need help resetting it.
+
+            </div>
+
+        </div>
+
+
+        <!-- Information -->
+
+        <div class="info-box">
+
+            Please keep your Query ID
+
+            <strong>
+                #<span th:text="${queryId}">
+                    10008700
+                </span>
+            </strong>
+
+            for future communication regarding this request.
+
+            <br><br>
+
+            We will contact you at
+
+            <strong th:text="${userEmail}">
+                user@example.com
+            </strong>
+
+            if any further information is required.
+
+        </div>
+
+    </div>
+
+
+    <!-- Footer -->
+
+    <div class="footer">
+
+        Thank you for using CloudVault Support.
+
+        <br>
+
+        This is an automated email.
+        Please do not reply directly to this message.
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
