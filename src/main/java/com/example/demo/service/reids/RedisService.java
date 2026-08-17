@@ -12,4 +12,6 @@ public interface RedisService {
 
     long getRemainingTtl(String key);
 
+    long incrementWithExpiry(String key, long timeoutSeconds );
+
 }

@@ -55,7 +55,7 @@ public class NotificationServiceImpl
 
         variables.put("time", LocalDateTime.now());
 
-        emailService.sendHtmlEmail(
+        emailService.sendHtmlEmailAsync(
 
                 user.getEmail(),
 
@@ -88,7 +88,7 @@ public class NotificationServiceImpl
 
         variables.put("time", session.getLoginTime());
 
-        emailService.sendHtmlEmail(
+        emailService.sendHtmlEmailAsync(
 
                 user.getEmail(),
 
@@ -114,7 +114,7 @@ public class NotificationServiceImpl
 
         variables.put("resetLink", resetLink);
 
-        emailService.sendHtmlEmail(
+        emailService.sendHtmlEmailAsync(
                 user.getEmail(),
                 "Reset your CloudVault password",
                 "email/password-reset",

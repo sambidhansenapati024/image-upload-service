@@ -64,4 +64,24 @@ public class RedisServiceImpl implements RedisService {
         return ttl == null ? 0 : ttl;
 
     }
+
+    @Override
+    public long incrementWithExpiry(
+            String key,
+            long timeoutSeconds) {
+
+        Long count =
+                redisTemplate.opsForValue()
+                        .increment(key);
+
+        if (count != null && count == 1) {
+
+            redisTemplate.expire(
+                    key,
+                    Duration.ofSeconds(timeoutSeconds)
+            );
+        }
+
+        return count == null ? 0 : count;
+    }
 }
