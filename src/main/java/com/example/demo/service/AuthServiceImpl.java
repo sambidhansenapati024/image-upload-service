@@ -6,6 +6,7 @@ import com.example.demo.entity.User;
 import com.example.demo.entity.UserSession;
 import com.example.demo.enums.ActionType;
 import com.example.demo.enums.OtpPurpose;
+import com.example.demo.enums.UserType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repo.ProfileRepository;
 import com.example.demo.repo.UserRepository;
@@ -206,12 +207,14 @@ public class AuthServiceImpl implements AuthService {
 
         String accessToken = jwtService.generateToken(
                 user.getEmail(),
-                session.getSessionId().toString()
+                session.getSessionId().toString(),
+                user.getUserType()
         );
 
         String refreshToken = jwtService.generateRefreshToken(
                 user.getEmail(),
-                session.getSessionId().toString()
+                session.getSessionId().toString(),
+                user.getUserType()
         );
 
         String refreshTokenJti =
@@ -276,6 +279,9 @@ public class AuthServiceImpl implements AuthService {
 
         String email =
                 jwtService.extractEmail(refreshToken);
+
+        UserType userType =
+                jwtService.extractUserType(refreshToken);
 
         // 3. Check Redis
         String redisSessionId =
@@ -381,14 +387,16 @@ public class AuthServiceImpl implements AuthService {
         String newAccessToken =
                 jwtService.generateToken(
                         email,
-                        sessionId
+                        sessionId,
+                        userType
                 );
 
         // 10. Generate NEW refresh token
         String newRefreshToken =
                 jwtService.generateRefreshToken(
                         email,
-                        sessionId
+                        sessionId,
+                        userType
                 );
 
         String newJti =

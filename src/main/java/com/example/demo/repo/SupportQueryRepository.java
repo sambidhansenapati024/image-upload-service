@@ -25,4 +25,7 @@ public interface SupportQueryRepository
             Long userId
     );
 
+    List<SupportQuery> findAllByOrderByCreatedAtDesc();
+
+
 }

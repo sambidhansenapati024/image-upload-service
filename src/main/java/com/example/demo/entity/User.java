@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.enums.UserType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,18 @@ public class User {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", nullable = false, length = 20)
+    private UserType userType;
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

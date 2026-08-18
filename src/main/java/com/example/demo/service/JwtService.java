@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.enums.UserType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -42,7 +43,8 @@ public class JwtService {
 
     public String generateToken(
             String email,
-            String sessionId
+            String sessionId,
+            UserType userType
     ) {
 
         return Jwts.builder()
@@ -52,6 +54,8 @@ public class JwtService {
                 .claim("sessionId", sessionId)
 
                 .claim("type", "ACCESS")
+
+                .claim("userType",userType.name())
 
                 .issuedAt(new Date())
 
@@ -74,7 +78,8 @@ public class JwtService {
 
     public String generateRefreshToken(
             String email,
-            String sessionId
+            String sessionId,
+            UserType userType
     ) {
 
         String jti = UUID.randomUUID().toString();
@@ -86,6 +91,8 @@ public class JwtService {
                 .claim("sessionId", sessionId)
 
                 .claim("type", "REFRESH")
+
+                .claim("userType",userType.name())
 
                 .id(jti)
 
@@ -157,6 +164,16 @@ public class JwtService {
         return claims.getId();
     }
 
+
+    public UserType extractUserType(String token) {
+
+        Claims claims = parseToken(token);
+
+        return claims.get(
+                "userType",
+                UserType.class
+        );
+    }
 
     // =========================================================
     // ACCESS TOKEN VALIDATION

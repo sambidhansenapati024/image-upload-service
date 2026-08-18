@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.security.CustomAccessDeniedHandler;
 import com.example.demo.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,11 +21,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtFilter,
+            CustomAccessDeniedHandler accessDeniedHandler) {
+
         this.jwtFilter = jwtFilter;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
@@ -35,8 +40,12 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**","/image-upload/version","/otp/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(
